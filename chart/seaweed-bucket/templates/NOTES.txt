@@ -1,0 +1,6 @@
+Bucket creation job has been created.
+
+Bucket name: {{ .Values.bucket.name }}
+TTL: {{ .Values.bucket.ttl }}
+S3 Identity: {{ .Values.s3.identity }}
+Master URL: http://{{ .Values.seaweedfs.masterHost }}:{{ .Values.seaweedfs.masterPort }}

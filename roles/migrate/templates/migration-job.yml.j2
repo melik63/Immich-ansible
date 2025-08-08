@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ migration_job_name }}
+  namespace: {{ migration_job_namespace }}
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: db-migrator
+          image: {{ migration_image }}
+          env:
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ migration_job_name }}-db-secrets
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ migration_job_name }}-db-secrets
+                  key: password
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ migration_job_name }}-db-secrets
+                  key: url
+          command: ["sh", "-c"]
+          args:
+            - |
+              # Выполняем миграции
+              echo "Running DB migrations..."
+              # Здесь можно использовать миграционный инструмент или SQL
+              # Например:
+              # psql $DB_URL -c "CREATE TABLE IF NOT EXISTS ..."
+              if [ $? -eq 0 ]; then
+                echo "Migration succeeded, deleting secret..."
+                kubectl delete secret {{ migration_job_name }}-db-secrets -n {{ migration_job_namespace }}
+              else
+                echo "Migration failed"
+                exit 1
+              fi
+      imagePullPolicy: IfNotPresent

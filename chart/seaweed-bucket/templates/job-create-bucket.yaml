@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+meta
+  name: seaweed-create-bucket-{{ .Values.bucket.name }}
+spec:
+  template:
+    spec:
+      containers:
+        - name: seaweed-client
+          image: amazon/aws-cli:latest
+          command: ["sh", "/scripts/create_bucket.sh"]
+          volumeMounts:
+            - name: script-volume
+              mountPath: /scripts
+            - name: s3-secrets
+              mountPath: /secrets
+              readOnly: true
+      volumes:
+        - name: script-volume
+          configMap:
+            name: seaweed-create-bucket-script
+        - name: s3-secrets
+          secret:
+            secretName: {{ printf "%s-s3-credentials" .Values.s3.identity }}
+      restartPolicy: Never
+  backoffLimit: 3

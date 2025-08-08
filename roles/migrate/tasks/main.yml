@@ -1,0 +1,30 @@
+---
+# tasks file for migrate
+- name: Создаём namespace, если его нет
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ migration_job_namespace }}"
+    state: present
+
+- name: Применяем Secret с реквизитами БД
+  ansible.builtin.template:
+    src: db-secret.yml.j2
+    dest: "/tmp/{{ migration_job_name }}-db-secret.yml"
+  register: secret_file
+
+- name: Применяем Secret
+  kubernetes.core.k8s:
+    src: "{{ secret_file.dest }}"
+    state: present
+
+- name: Применяем Job
+  ansible.builtin.template:
+    src: migration-job.yml.j2
+    dest: "/tmp/{{ migration_job_name }}-job.yml"
+  register: job_file
+
+- name: Запускаем Job
+  kubernetes.core.k8s:
+    src: "{{ job_file.dest }}"
+    state: present

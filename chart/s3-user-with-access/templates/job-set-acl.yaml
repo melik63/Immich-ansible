@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+meta
+  name: seaweed-grant-access-{{ .Values.s3.identity }}-to-{{ .Values.bucketAccess.bucket }}
+spec:
+  template:
+    spec:
+      containers:
+        - name: seaweed-acl
+          image: amazon/aws-cli:latest
+          command: ["sh", "/scripts/set_acl.sh"]
+          volumeMounts:
+            - name: script-volume
+              mountPath: /scripts
+            - name: admin-secrets
+              mountPath: /admin-secrets
+              readOnly: true
+      volumes:
+        - name: script-volume
+          configMap:
+            name: seaweed-set-acl-script-{{ .Values.s3.identity }}
+        - name: admin-secrets
+          secret:
+            secretName: admin-s3-credentials
+      restartPolicy: Never
+  backoffLimit: 3

@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+meta
+  name: seaweed-create-bucket-script
+
+  create_bucket.sh: |
+    #!/bin/sh
+    set -e
+
+    IDENTITY="{{ .Values.s3.identity }}"
+    BUCKET_NAME="{{ .Values.bucket.name }}"
+    TTL="{{ .Values.bucket.ttl }}"
+
+    ACCESS_KEY=$(cat /secrets/accessKey)
+    SECRET_KEY=$(cat /secrets/secretKey)
+
+    echo "Creating bucket $BUCKET_NAME for identity $IDENTITY..."
+
+    export AWS_ACCESS_KEY_ID="$ACCESS_KEY"
+    export AWS_SECRET_ACCESS_KEY="$SECRET_KEY"
+    export AWS_DEFAULT_REGION=us-east-1
+
+    # 1. Создаем бакет через S3 API
+    aws s3api create-bucket --bucket "$BUCKET_NAME" \
+      --endpoint-url http://{{ .Values.seaweedfs.masterHost }}:{{ .Values.seaweedfs.s3Port }}
+
+    # 2. Устанавливаем TTL через REST API SeaweedFS
+    curl -X POST "http://{{ .Values.seaweedfs.masterHost }}:{{ .Values.seaweedfs.masterPort }}/buckets/$BUCKET_NAME?ttl=$TTL" \
+      -H "Content-Type: application/json" \
+      -u "$IDENTITY:$SECRET_KEY"
+
+    echo "Bucket created successfully."

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: seaweed-bucket
+description: Создаёт бакет в SeaweedFS и привязывает его к существующему S3 пользователю
+version: 0.1.0
+appVersion: "1.0"
+dependencies:
+  - name: s3-identity
+    version: 0.1.0
+    repository: file://../s3-identity

@@ -1,0 +1,8 @@
+S3 пользователь создан и ему предоставлен доступ к бакету.
+
+Identity: {{ .Values.s3.identity }}
+Access Key: {{ default (randAlphaNum 20) .Values.s3.accessKey }}
+Secret Key: {{ default (randAlphaNum 40) .Values.s3.secretKey }}
+
+Бакет: {{ .Values.bucketAccess.bucket }}
+Права: {{ toJson .Values.bucketAccess.permissions }}

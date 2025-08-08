@@ -1,0 +1,13 @@
+bucket:
+  name: "default-bucket"
+  ttl: "7d"
+
+s3:
+  identity: "default-user"
+  # Флаг, указывающий, использовать ли существующего пользователя или создавать новый
+  useExistingIdentity: true
+
+seaweedfs:
+  masterHost: "seaweedfs-master"
+  masterPort: 9333
+  s3Port: 8333

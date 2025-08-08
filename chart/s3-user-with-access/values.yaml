@@ -1,0 +1,10 @@
+s3:
+  identity: "default-user"
+  accessKey: "" # Автоматически генерируется
+  secretKey: ""
+
+bucketAccess:
+  bucket: "default-bucket"
+  permissions:
+    - s3:GetObject
+    - s3:ListBucket
