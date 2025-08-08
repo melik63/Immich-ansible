@@ -1,0 +1,5 @@
+apiVersion: v2
+name: s3-user-with-access
+description: Создаёт S3 пользователя и назначает ему права на существующий бакет
+version: 0.1.0
+appVersion: "1.0"

@@ -1,0 +1,9 @@
+# values.yaml
+postgresqlDatabase: postgres
+postgresqlUsername: postgres
+postgresqlPassword: postgres
+postgresqlPostgresPassword: postgres!
+service:
+  type: ClusterIP
+persistence:
+  enabled: false
