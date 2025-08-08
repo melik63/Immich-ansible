@@ -1,0 +1,42 @@
+---
+# tasks file for immich
+
+- name: Create namespace {{ immich_namespace }}
+  community.kubernetes.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ immich_namespace }}"
+
+- name: Apply DB Secret
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'secret.yaml.j2') }}"
+
+- name: Apply PVCs (data + postgres)
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'pvc.yaml.j2') }}"
+
+- name: Apply PostgreSQL Deployment and Service
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'postgres-deployment.yaml.j2') }}"
+
+- name: Apply Redis Deployment
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'deployment.yaml.j2') }}"
+  # Здесь Redis и основные компоненты (server, microservices, ml)
+
+- name: Apply Services (server + redis)
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'service.yaml.j2') }}"
+
+- name: Apply Ingress
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'ingress.yaml.j2') }}"

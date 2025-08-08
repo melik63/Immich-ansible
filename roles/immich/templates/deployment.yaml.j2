@@ -1,0 +1,75 @@
+{% for component in immich_components %}
+---
+apiVersion: apps/v1
+kind: Deployment
+meta
+  name: immich-{{ component.name }}
+  namespace: {{ immich_namespace }}
+  labels:
+    app: immich
+    component: {{ component.name }}
+spec:
+  replicas: {{ component.replicas }}
+  selector:
+    matchLabels:
+      app: immich
+      component: {{ component.name }}
+  template:
+    metadata:
+      labels:
+        app: immich
+        component: {{ component.name }}
+    spec:
+      containers:
+      - name: {{ component.name }}
+        image: {{ component.image }}
+        ports:
+        - containerPort: {{ component.port }}
+        envFrom:
+        - secretRef:
+            name: immich-db-secret
+        - configMapRef:
+            name: immich-config  # (если будет)
+        volumeMounts:
+        - name: data-storage
+          mountPath: /usr/src/app/upload
+        resources:
+          requests:
+            memory: "{{ immich_server_resources.requests.memory }}"
+            cpu: "{{ immich_server_resources.requests.cpu }}"
+          limits:
+            memory: "{{ immich_server_resources.limits.memory }}"
+            cpu: "{{ immich_server_resources.limits.cpu }}"
+      volumes:
+      - name: data-storage
+        persistentVolumeClaim:
+          claimName: immich-data
+{% endfor %}
+
+---
+# Redis Deployment (без изменений)
+apiVersion: apps/v1
+kind: Deployment
+meta
+  name: immich-redis
+  namespace: {{ immich_namespace }}
+  labels:
+    app: immich
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich
+      component: redis
+  template:
+    meta
+      labels:
+        app: immich
+        component: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
