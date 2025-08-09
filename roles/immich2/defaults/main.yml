@@ -1,3 +1,4 @@
+# roles/immich2/defaults/main.yml
 ---
 # Параметры по умолчанию
 
@@ -6,24 +7,17 @@ immich_server_image: "ghcr.io/immich-app/immich-server:v1.137.3"
 immich_machine_learning_image: "ghcr.io/immich-app/immich-machine-learning:v1.137.3"
 immich_namespace: "immich"
 nginx_image: "docker.io/nginx:alpine"
+immich_server_port: 3000
+immich_api_port: 3001
+nginx_port: 8080
 
 # Пути к данным
 immich_storage_path: "/opt/immich/data"
 immich_upload_path: "/opt/immich/upload"
 
-# Порты
-immich_server_port: 3000        # Web UI
-immich_api_port: 3001          # API (внутри immich-server)
-nginx_port: 80
-
-# Ресурсы
-immich_server_resources:
-  requests:
-    memory: "512Mi"
-    cpu: "250m"
-  limits:
-    memory: "1Gi"
-    cpu: "500m"
+# 🔥 Правильный порт, на котором слушает immich-server
+immich_server_internal_port: 3000
+immich_nginx_port: 8080
 
 # PostgreSQL и Redis
 immich_postgres_host: "postgres"
@@ -35,5 +29,14 @@ immich_postgres_db: "immich"
 immich_redis_host: "redis"
 immich_redis_port: 6379
 
-# Параметры обратного прокси (Nginx)
+# Ресурсы
+immich_server_resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+# Nginx шаблон
 immich_nginx_config_template: "nginx.conf.j2"
