@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: immich-env-config
+  namespace: {{ immich_namespace }}
 data:
   .env: |
 {% for line in lookup('file', 'files/immich.env') | split('\n') %}
@@ -12,6 +13,7 @@ apiVersion: v1
 kind: ConfigMap
 meta
   name: nginx-config
+  namespace: {{ immich_namespace }}
 data:
   nginx.conf: |
 {% for line in lookup('template', 'nginx.conf.j2') | split('\n') %}

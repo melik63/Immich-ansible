@@ -1,21 +1,23 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
-meta
+metadata:
   name: immich-data-pvc
+  namespace: {{ immich_namespace }}  # <-- Добавлено
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 50Gi
+      storage: 5Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
-meta
+metadata:
   name: immich-upload-pvc
+  namespace: {{ immich_namespace }}  # <-- Добавлено
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 200Gi
+      storage: 20Gi

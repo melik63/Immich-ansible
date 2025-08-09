@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 meta
   name: immich-api
+  namespace: {{ immich_namespace }}
 spec:
   replicas: 1
   selector:
@@ -44,6 +45,7 @@ apiVersion: apps/v1
 kind: Deployment
 meta
   name: immich-server
+  namespace: {{ immich_namespace }}
 spec:
   replicas: 1
   selector:
@@ -79,6 +81,7 @@ apiVersion: apps/v1
 kind: Deployment
 meta
   name: immich-ml
+  namespace: {{ immich_namespace }}
 spec:
   replicas: 1
   selector:

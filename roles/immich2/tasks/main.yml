@@ -1,24 +1,33 @@
 ---
+- name: Создание namespace {{ immich_namespace }}
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ immich_namespace }}"
+  ignore_errors: yes  # Чтобы не падать, если namespace уже есть
+
 - name: Создание PVC для данных и загрузок
   k8s:
-    definition: "{{ lookup('template', 'immich-pvc.yml.j2') | from_yaml }}"
+    definition: "{{ lookup('template', 'immich-pvc.yml.j2') | from_yaml_all }}"
 
 - name: Создание ConfigMap с переменными окружения и Nginx конфигом
   k8s:
-    definition: "{{ lookup('template', 'immich-configmap.yml.j2') | from_yaml }}"
+    definition: "{{ lookup('template', 'immich-configmap.yml.j2') | from_yaml_all }}"
 
 - name: Установка Deployment для Immich API, Server и ML
   k8s:
-    definition: "{{ lookup('template', 'immich-deployment.yml.j2') | from_yaml }}"
+    definition: "{{ lookup('template', 'immich-deployment.yml.j2') | from_yaml_all }}"
 
 - name: Установка Service для Immich API и Server
   k8s:
-    definition: "{{ lookup('template', 'immich-service.yml.j2') | from_yaml }}"
+    definition: "{{ lookup('template', 'immich-service.yml.j2') | from_yaml_all }}"
 
 - name: Установка Nginx Deployment
   k8s:
-    definition: "{{ lookup('template', 'nginx-deployment.yml.j2') | from_yaml }}"
+    definition: "{{ lookup('template', 'nginx-deployment.yml.j2') | from_yaml_all }}"
 
 - name: Установка Nginx Service (LoadBalancer)
   k8s:
-    definition: "{{ lookup('template', 'nginx-service.yml.j2') | from_yaml }}"
+    definition: "{{ lookup('template', 'nginx-service.yml.j2') | from_yaml_all }}"

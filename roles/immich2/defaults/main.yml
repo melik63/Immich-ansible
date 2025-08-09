@@ -5,6 +5,7 @@
 immich_api_image: "immich/api:latest"
 immich_server_image: "immich/server:latest"
 immich_machine_learning_image: "immich/machine-learning:latest"
+immich_namespace: "immich"
 nginx_image: "nginx:alpine"
 
 # Пути к данным
