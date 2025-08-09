@@ -1,4 +1,14 @@
 ---
+- name: Doker login
+  gather_facts: no
+  hosts: k3s
+  tags: docker-login
+  roles:
+    - ghcr-login
+  environment:
+    K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
+  become: yes
+
 - name: Установка immich
   gather_facts: no
   hosts: k3s
@@ -14,6 +24,7 @@
 - name: Установка immich2
   gather_facts: no
   hosts: k3s
+  tags: immich2
   roles:
     - { role: 'immich2', tags: 'immich2'}
     - { role: 'immich-db-migrate', tags: 'immich-db-migrate'}
