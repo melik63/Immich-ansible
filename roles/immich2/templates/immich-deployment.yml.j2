@@ -18,7 +18,9 @@ spec:
           image: "{{ immich_server_image }}"
           ports:
             - containerPort: {{ immich_server_port }}
+              protocol: TCP
             - containerPort: {{ immich_api_port }}
+              protocol: TCP
           envFrom:
             - configMapRef:
                 name: immich-env-config

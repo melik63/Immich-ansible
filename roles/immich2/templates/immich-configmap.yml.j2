@@ -4,10 +4,34 @@ metadata:
   name: immich-env-config
   namespace: {{ immich_namespace }}
 data:
-  .env: |
-{% for line in lookup('file', 'files/immich.env') | split('\n') %}
-    {{ line | replace('{{ immich_postgres_host }}', immich_postgres_host) | replace('{{ immich_postgres_port }}', immich_postgres_port | string) | replace('{{ immich_postgres_user }}', immich_postgres_user) | replace('{{ immich_postgres_password }}', immich_postgres_password) | replace('{{ immich_postgres_db }}', immich_postgres_db) | replace('{{ immich_redis_host }}', immich_redis_host) | replace('{{ immich_redis_port }}', immich_redis_port | string) | replace('{{ immich_upload_path }}', immich_upload_path) }}
-{% endfor %}
+  # PostgreSQL — в нижнем регистре, с опечаткой "postres"
+  DATABASE_HOST: "{{ immich_postgres_host }}"
+  DATABASE_PORT: "{{ immich_postgres_port }}"
+  DATABASE_USER: "{{ immich_postgres_user }}"
+  DATABASE_PASSWORD: "{{ immich_postgres_password }}"
+  DATABASE_NAME: "{{ immich_postgres_db }}"
+
+  POSTGRES_HOST: "{{ immich_postgres_host }}"
+  POSTGRES_PORT: "{{ immich_postgres_port }}"
+  POSTGRES_USER: "{{ immich_postgres_user }}"
+  POSTGRES_PASSWORD: "{{ immich_postgres_password }}"
+  POSTGRES_DB: "{{ immich_postgres_db }}"
+
+  datebase_host:  "{{ immich_postgres_host }}"
+  postres_host: "{{ immich_postgres_host }}"
+  postres_port: "{{ immich_postgres_port }}"
+  postres_user: "{{ immich_postgres_user }}"
+  postres_password: "{{ immich_postgres_password }}"
+  postres_db: "{{ immich_postgres_db }}"
+
+  # Redis — в верхнем регистре
+  REDIS_HOST: "{{ immich_redis_host }}"
+  REDIS_PORT: "{{ immich_redis_port }}"
+
+  # Путь для загрузки
+  UPLOAD_PATH: "{{ immich_upload_path }}"
+
+  NODE_ENV: "production"
 ---
 apiVersion: v1
 kind: ConfigMap
