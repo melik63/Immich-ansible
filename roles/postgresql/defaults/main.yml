@@ -1,6 +1,7 @@
+# roles/postgresql/defaults/main.yml
 ---
 postgres_namespace: "immich"
-postgres_image: "postgres:15-alpine"
+postgres_image: "pgvector/pgvector:pg17"
 postgres_port: 5432
 postgres_db: "immich"
 postgres_user: "immich"

@@ -1,3 +1,4 @@
+# roles/postgresql/tasks/main.yml
 ---
 - name: Создание namespace {{ postgres_namespace }} (если ещё не создан)
   k8s:
@@ -23,6 +24,18 @@
           requests:
             storage: "{{ postgres_storage_size }}"
   when: postgres_persistence_enabled
+
+- name: Создание ConfigMap с init.sql для включения pgvector
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: postgres-initdb-config
+        namespace: "{{ postgres_namespace }}"
+      data:
+        init.sql: |
+          CREATE EXTENSION IF NOT EXISTS "vector";
 
 - name: Развертывание PostgreSQL Deployment
   k8s:

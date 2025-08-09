@@ -12,7 +12,7 @@
 - name: Установка immich2
   gather_facts: no
   hosts: k3s
-  tags: immich2
+  tags: immich
   roles:
     - { role: 'immich2', tags: 'immich2'}
     - { role: 'redis', tags: 'redis'}
