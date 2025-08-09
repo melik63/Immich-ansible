@@ -3,7 +3,7 @@
   hosts: k3s
   become: yes
   vars:
-    k3s_version: v1.28.9+k3s1  # Опционально, укажите нужную версию
+    k3s_version: v1.28.9+k3s1
 
   tasks:
     - name: Обновить список пакетов
@@ -20,7 +20,7 @@
 
     - name: Скачать и установить k3s
       shell: |
-        curl -sfL https://get.k3s.io  | INSTALL_K3S_VERSION={{ k3s_version }} sh -
+        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -
       args:
         executable: /bin/bash
 
@@ -71,6 +71,14 @@
           Чтобы он заработал, откройте новую сессию или выполните:
           exec bash -l
 
+    - name: Скачать kubeconfig на локальный хост (Ansible) для дальнейшей работы с k8s
+      fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "{{ playbook_dir }}/../kubeconfig/k3s.yaml"
+        flat: yes
+      delegate_to: "{{ inventory_hostname }}"
+      run_once: yes
+
     - name: Показать токен агента (node-token)
       slurp:
         src: /var/lib/rancher/k3s/server/node-token
@@ -85,3 +93,80 @@
       systemd:
         name: k3s
         state: restarted
+
+# --- НОВЫЙ PLAY: Установка MetalLB через локальный kubectl ---
+- name: Установка и настройка MetalLB через локальный kubectl
+  hosts: localhost
+  connection: local
+  become: false
+  gather_facts: no
+  vars:
+    kubeconfig_local: "{{ playbook_dir }}/../kubeconfig/k3s.yaml"
+    k3s_node_ip: "192.168.1.23"  # Укажи свой IP ноды
+    metallb_version: v0.14.5
+    metallb_ip_range_start: 192.168.1.23
+    metallb_ip_range_end: 192.168.1.23
+
+  tasks:
+    - name: Убедиться, что директория с kubeconfig существует
+      file:
+        path: "{{ playbook_dir }}/../kubeconfig"
+        state: directory
+
+    - name: Ждать, пока kubeconfig станет доступен
+      wait_for:
+        path: "{{ kubeconfig_local }}"
+        timeout: 60
+      run_once: yes
+
+    - name: Заменить server в kubeconfig с 127.0.0.1 на IP ноды
+      lineinfile:
+        path: "{{ kubeconfig_local }}"
+        regexp: '^\\s*server:\\s*https?://127\\.0\\.0\\.1:6443'
+        line: "    server: https://{{ k3s_node_ip }}:6443"
+      run_once: yes
+
+    - name: Установить MetalLB — применение манифеста
+      k8s:
+        state: present
+        src: "https://raw.githubusercontent.com/metallb/metallb/{{ metallb_version }}/config/manifests/metallb-native.yaml"
+        kubeconfig: "{{ kubeconfig_local }}"
+      register: metallb_install
+      retries: 3
+      delay: 5
+      until: metallb_install is not failed
+
+    - name: Ожидание создания namespace metallb-system
+      command: >
+        kubectl --kubeconfig={{ kubeconfig_local }} get namespace metallb-system
+      retries: 12
+      delay: 5
+      ignore_errors: yes
+
+    - name: Создать IPAddressPool
+      k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_local }}"
+        definition:
+          apiVersion: metallb.io/v1beta1
+          kind: IPAddressPool
+          meta:
+            name: default-pool
+            namespace: metallb-system
+          spec:
+            addresses:
+              - "{{ metallb_ip_range_start }}-{{ metallb_ip_range_end }}"
+
+    - name: Создать L2Advertisement
+      k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig_local }}"
+        definition:
+          apiVersion: metallb.io/v1beta1
+          kind: L2Advertisement
+          meta:
+            name: default-adv
+            namespace: metallb-system
+          spec:
+            ipAddressPools:
+              - default-pool
