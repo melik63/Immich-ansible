@@ -13,6 +13,28 @@ spec:
       labels:
         app: immich-server
     spec:
+      initContainers:
+        - name: init-data-folders
+          image: alpine:3
+          command:
+            - sh
+            - -c
+            - >
+              mkdir -p /data/upload &&
+              mkdir -p /data/encoded-video &&
+              mkdir -p /data/thumbs &&
+              mkdir -p /data/backups &&
+              mkdir -p /data/library &&
+              mkdir -p /data/profile &&
+              touch /data/upload/.immich &&
+              touch /data/encoded-video/.immich &&
+              touch /data/thumbs/.immich &&
+              touch /data/backups/.immich &&
+              touch /data/library/.immich &&
+              touch /data/profile/.immich
+          volumeMounts:
+            - name: data-storage
+              mountPath: {{ immich_storage_path }}
       containers:
         - name: server
           image: "{{ immich_server_image }}"
@@ -21,14 +43,17 @@ spec:
               protocol: TCP
             - containerPort: {{ immich_api_port }}
               protocol: TCP
+            - containerPort: 2283
+              protocol: TCP
+          env:
+            - name: IMMICH_SERVER_PORT
+              value: "2283"
           envFrom:
             - configMapRef:
                 name: immich-env-config
           volumeMounts:
             - name: data-storage
               mountPath: {{ immich_storage_path }}
-            - name: upload-storage
-              mountPath: {{ immich_upload_path }}
           resources:
             requests:
               memory: "{{ immich_server_resources.requests.memory }}"
@@ -40,9 +65,6 @@ spec:
         - name: data-storage
           persistentVolumeClaim:
             claimName: immich-data-pvc
-        - name: upload-storage
-          persistentVolumeClaim:
-            claimName: immich-upload-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -65,3 +87,4 @@ spec:
           envFrom:
             - configMapRef:
                 name: immich-env-config
+

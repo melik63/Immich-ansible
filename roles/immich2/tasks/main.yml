@@ -31,3 +31,8 @@
 - name: Установка Nginx Service (LoadBalancer)
   k8s:
     definition: "{{ lookup('template', 'nginx-service.yml.j2') | from_yaml_all }}"
+
+- name: Установка Ingress для Immich Server (порт 2283)
+  k8s:
+    definition: "{{ lookup('template', 'immich-ingress.yml.j2') | from_yaml }}"
+  when: immich_enable_ingress is undefined or immich_enable_ingress | bool

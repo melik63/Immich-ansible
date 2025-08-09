@@ -4,24 +4,6 @@ metadata:
   name: immich-env-config
   namespace: {{ immich_namespace }}
 data:
-  # PostgreSQL — в нижнем регистре, с опечаткой "postres"
-#  DATABASE_URL: "postgresql://{{ immich_postgres_user }}:{{ immich_postgres_password }}@{{ immich_postgres_host }}:{{ immich_postgres_port }}/{{ immich_postgres_db }}"
-#  DATABASE_HOST: "{{ immich_postgres_host }}"
-#  DATABASE_PORT: "{{ immich_postgres_port }}"
-#  DATABASE_USER: "{{ immich_postgres_user }}"
-#  DATABASE_PASSWORD: "{{ immich_postgres_password }}"
-#  DATABASE_NAME: "{{ immich_postgres_db }}"
-#  POSTGRES_HOST: "{{ immich_postgres_host }}"
-#  POSTGRES_PORT: "{{ immich_postgres_port }}"
-#  POSTGRES_USER: "{{ immich_postgres_user }}"
-#  POSTGRES_PASSWORD: "{{ immich_postgres_password }}"
-#  POSTGRES_DB: "{{ immich_postgres_db }}"
-#  datebase_host:  "{{ immich_postgres_host }}"
-#  postres_host: "{{ immich_postgres_host }}"
-#  postres_port: "{{ immich_postgres_port }}"
-#  postres_user: "{{ immich_postgres_user }}"
-#  postres_password: "{{ immich_postgres_password }}"
-#  postres_db: "{{ immich_postgres_db }}"
   DB_HOSTNAME: "{{ immich_postgres_host }}"
   DB_PORT:     "{{ immich_postgres_port }}"
   DB_USERNAME: "{{ immich_postgres_user }}"
@@ -29,13 +11,13 @@ data:
   DB_DATABASE_NAME: "{{ immich_postgres_db }}"
   DB_URL: "postgresql://{{ immich_postgres_user }}:{{ immich_postgres_password }}@{{ immich_postgres_host }}:{{ immich_postgres_port }}/{{ immich_postgres_db }}"
 
+  SERVER_HOST: "0.0.0.0"
+  SERVER_PORT: "3333"
 
-  # Redis — в верхнем регистре
   REDIS_HOST: "{{ immich_redis_host }}"
   REDIS_PORT: "{{ immich_redis_port }}"
 
-  # Путь для загрузки
-  UPLOAD_PATH: "{{ immich_upload_path }}"
+  UPLOAD_PATH: "/data/upload"
 
   NODE_ENV: "production"
 ---
@@ -49,3 +31,4 @@ data:
 {% for line in lookup('template', 'nginx.conf.j2') | split('\n') %}
     {{ line }}
 {% endfor %}
+

@@ -12,11 +12,11 @@ immich_api_port: 3001
 nginx_port: 8080
 
 # Пути к данным
-immich_storage_path: "/opt/immich/data"
-immich_upload_path: "/opt/immich/upload"
+immich_storage_path: "/data"
+immich_upload_path: "/data/upload"
 
 # 🔥 Правильный порт, на котором слушает immich-server
-immich_server_internal_port: 3000
+immich_server_internal_port: 3333
 immich_nginx_port: 8080
 
 # PostgreSQL и Redis
@@ -40,3 +40,5 @@ immich_server_resources:
 
 # Nginx шаблон
 immich_nginx_config_template: "nginx.conf.j2"
+
+immich_enable_ingress: true
