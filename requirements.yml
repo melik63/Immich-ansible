@@ -1,0 +1,4 @@
+# requirements.yml
+collections:
+  - name: community.kubernetes
+#    version: 3.0.0  # или актуальная версия

@@ -1,0 +1,24 @@
+---
+- name: Создание PVC для данных и загрузок
+  k8s:
+    definition: "{{ lookup('template', 'immich-pvc.yml.j2') | from_yaml }}"
+
+- name: Создание ConfigMap с переменными окружения и Nginx конфигом
+  k8s:
+    definition: "{{ lookup('template', 'immich-configmap.yml.j2') | from_yaml }}"
+
+- name: Установка Deployment для Immich API, Server и ML
+  k8s:
+    definition: "{{ lookup('template', 'immich-deployment.yml.j2') | from_yaml }}"
+
+- name: Установка Service для Immich API и Server
+  k8s:
+    definition: "{{ lookup('template', 'immich-service.yml.j2') | from_yaml }}"
+
+- name: Установка Nginx Deployment
+  k8s:
+    definition: "{{ lookup('template', 'nginx-deployment.yml.j2') | from_yaml }}"
+
+- name: Установка Nginx Service (LoadBalancer)
+  k8s:
+    definition: "{{ lookup('template', 'nginx-service.yml.j2') | from_yaml }}"

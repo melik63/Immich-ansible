@@ -1,0 +1,39 @@
+---
+# Параметры по умолчанию
+
+# Образы
+immich_api_image: "immich/api:latest"
+immich_server_image: "immich/server:latest"
+immich_machine_learning_image: "immich/machine-learning:latest"
+nginx_image: "nginx:alpine"
+
+# Пути к данным
+immich_storage_path: "/opt/immich/data"
+immich_upload_path: "/opt/immich/upload"
+
+# Порты
+immich_api_port: 3001
+immich_server_port: 3000
+nginx_port: 80
+
+# Ресурсы
+immich_api_resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+# PostgreSQL и Redis
+immich_postgres_host: "postgres.default.svc.cluster.local"
+immich_postgres_port: 5432
+immich_postgres_user: "immich"
+immich_postgres_password: "immich"
+immich_postgres_db: "immich"
+
+immich_redis_host: "redis.default.svc.cluster.local"
+immich_redis_port: 6379
+
+# Параметры обратного прокси (Nginx)
+immich_nginx_config_template: "nginx.conf.j2"

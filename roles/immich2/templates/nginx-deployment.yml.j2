@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+meta
+  name: immich-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-nginx
+  template:
+    meta
+      labels:
+        app: immich-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: "{{ nginx_image }}"
+          ports:
+            - containerPort: {{ nginx_port }}
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config

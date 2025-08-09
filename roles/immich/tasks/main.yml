@@ -1,6 +1,3 @@
----
-# tasks file for immich
-
 - name: Create namespace {{ immich_namespace }}
   community.kubernetes.k8s:
     state: present

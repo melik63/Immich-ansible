@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: immich-env-config
+data:
+  .env: |
+{% for line in lookup('file', 'files/immich.env') | split('\n') %}
+    {{ line | replace('{{ immich_postgres_host }}', immich_postgres_host) | replace('{{ immich_postgres_port }}', immich_postgres_port | string) | replace('{{ immich_postgres_user }}', immich_postgres_user) | replace('{{ immich_postgres_password }}', immich_postgres_password) | replace('{{ immich_postgres_db }}', immich_postgres_db) | replace('{{ immich_redis_host }}', immich_redis_host) | replace('{{ immich_redis_port }}', immich_redis_port | string) | replace('{{ immich_upload_path }}', immich_upload_path) }}
+{% endfor %}
+---
+apiVersion: v1
+kind: ConfigMap
+meta
+  name: nginx-config
+data:
+  nginx.conf: |
+{% for line in lookup('template', 'nginx.conf.j2') | split('\n') %}
+    {{ line }}
+{% endfor %}

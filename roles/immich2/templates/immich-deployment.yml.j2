@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+meta
+  name: immich-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-api
+  template:
+    meta
+      labels:
+        app: immich-api
+    spec:
+      containers:
+        - name: api
+          image: "{{ immich_api_image }}"
+          ports:
+            - containerPort: {{ immich_api_port }}
+          envFrom:
+            - configMapRef:
+                name: immich-env-config
+          volumeMounts:
+            - name: data-storage
+              mountPath: {{ immich_storage_path }}
+            - name: upload-storage
+              mountPath: {{ immich_upload_path }}
+          resources:
+            requests:
+              memory: "{{ immich_api_resources.requests.memory }}"
+              cpu: "{{ immich_api_resources.requests.cpu }}"
+            limits:
+              memory: "{{ immich_api_resources.limits.memory }}"
+              cpu: "{{ immich_api_resources.limits.cpu }}"
+      volumes:
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: immich-data-pvc
+        - name: upload-storage
+          persistentVolumeClaim:
+            claimName: immich-upload-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+meta
+  name: immich-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-server
+  template:
+    meta
+      labels:
+        app: immich-server
+    spec:
+      containers:
+        - name: server
+          image: "{{ immich_server_image }}"
+          ports:
+            - containerPort: {{ immich_server_port }}
+          envFrom:
+            - configMapRef:
+                name: immich-env-config
+          volumeMounts:
+            - name: data-storage
+              mountPath: {{ immich_storage_path }}
+            - name: upload-storage
+              mountPath: {{ immich_upload_path }}
+      volumes:
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: immich-data-pvc
+        - name: upload-storage
+          persistentVolumeClaim:
+            claimName: immich-upload-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+meta
+  name: immich-ml
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-ml
+  template:
+    meta
+      labels:
+        app: immich-ml
+    spec:
+      containers:
+        - name: ml
+          image: "{{ immich_machine_learning_image }}"
+          envFrom:
+            - configMapRef:
+                name: immich-env-config
