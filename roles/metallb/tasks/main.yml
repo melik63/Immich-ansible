@@ -116,15 +116,9 @@
           metallb.universe.tf/allow-shared-ip: "true"
     apply: yes
 
-- name: Разрешить общий IP для seaweedfs-master
-  k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Service
-      metadata:
-        name: seaweedfs-master
-        namespace: seaweed
-        annotations:
-          metallb.universe.tf/allow-shared-ip: "true"
-    apply: yes
+- name: Разрешить общий IP для seaweedfs-master (через kubectl patch)
+  command: >
+    kubectl patch svc seaweedfs-master -n seaweed -p '{"metadata": {"annotations": {"metallb.universe.tf/allow-shared-ip": "true"}}}'
+  args:
+    creates: /tmp/.annotation_seaweedfs_master_shared  # чтобы не запускать каждый раз
+  delegate_to: 192.168.1.23
