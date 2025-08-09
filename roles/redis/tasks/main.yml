@@ -26,8 +26,8 @@
 
 - name: Развертывание Redis Deployment
   k8s:
-    definition: "{{ lookup('template', 'redis-deployment.yml.j2') | from_yaml_all }}"
+    definition: "{{ lookup('template', 'redis-deployment.yml.j2') | from_yaml }}"
 
 - name: Развертывание Redis Service
   k8s:
-    definition: "{{ lookup('template', 'redis-service.yml.j2') | from_yaml_all }}"
+    definition: "{{ lookup('template', 'redis-service.yml.j2') | from_yaml }}"
