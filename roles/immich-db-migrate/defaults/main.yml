@@ -7,7 +7,7 @@ immich_postgres_password: "immich"  # Ansible будет использоват�
 immich_postgres_db: "immich"
 
 # Образ
-immich_api_image: "immich/api:latest"
+immich_api_image: "ghcr.io/immich-app/immich-server:v1.137.3"
 
 # Имя Secret
 immich_db_secret_name: "immich-db-credentials"

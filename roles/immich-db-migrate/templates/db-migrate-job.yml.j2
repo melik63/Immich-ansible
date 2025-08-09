@@ -20,6 +20,8 @@ spec:
                 name: "{{ immich_db_secret_name }}"
           # Теперь DATABASE_URL нужно собрать вручную, т.к. его нет в Secret
           env:
+            - name: ENABLE_DB_MIGRATIONS
+              value: "true"
             - name: DATABASE_URL
               value: >-
                 postgresql://$(DATABASE_USER):$(DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)?schema=public

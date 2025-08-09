@@ -1,25 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: immich-api-svc
-  namespace: {{ immich_namespace }}
-spec:
-  selector:
-    app: immich-api
-  ports:
-    - protocol: TCP
-      port: {{ immich_api_port }}
-      targetPort: {{ immich_api_port }}
----
-apiVersion: v1
-kind: Service
-metadata:
   name: immich-server-svc
   namespace: {{ immich_namespace }}
 spec:
   selector:
     app: immich-server
   ports:
-    - protocol: TCP
+    - name: web
+      protocol: TCP
       port: {{ immich_server_port }}
       targetPort: {{ immich_server_port }}
+    - name: api
+      protocol: TCP
+      port: {{ immich_api_port }}
+      targetPort: {{ immich_api_port }}

@@ -1,0 +1,33 @@
+---
+- name: Создание namespace {{ redis_namespace }} (если ещё не создан)
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ redis_namespace }}"
+  ignore_errors: yes
+
+- name: Создание PVC для Redis (если включено сохранение)
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: redis-pvc
+        namespace: "{{ redis_namespace }}"
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "{{ redis_storage_size }}"
+  when: redis_persistence_enabled
+
+- name: Развертывание Redis Deployment
+  k8s:
+    definition: "{{ lookup('template', 'redis-deployment.yml.j2') | from_yaml_all }}"
+
+- name: Развертывание Redis Service
+  k8s:
+    definition: "{{ lookup('template', 'redis-service.yml.j2') | from_yaml_all }}"

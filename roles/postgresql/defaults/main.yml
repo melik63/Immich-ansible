@@ -1,0 +1,9 @@
+---
+postgres_namespace: "immich"
+postgres_image: "postgres:15-alpine"
+postgres_port: 5432
+postgres_db: "immich"
+postgres_user: "immich"
+postgres_password: "immich"
+postgres_persistence_enabled: false
+postgres_storage_size: "10Gi"

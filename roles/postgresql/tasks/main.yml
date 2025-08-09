@@ -1,0 +1,33 @@
+---
+- name: Создание namespace {{ postgres_namespace }} (если ещё не создан)
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ postgres_namespace }}"
+  ignore_errors: yes
+
+- name: Создание PVC для PostgreSQL
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: postgres-pvc
+        namespace: "{{ postgres_namespace }}"
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "{{ postgres_storage_size }}"
+  when: postgres_persistence_enabled
+
+- name: Развертывание PostgreSQL Deployment
+  k8s:
+    definition: "{{ lookup('template', 'postgres-deployment.yml.j2') | from_yaml }}"
+
+- name: Развертывание PostgreSQL Service
+  k8s:
+    definition: "{{ lookup('template', 'postgres-service.yml.j2') | from_yaml }}"

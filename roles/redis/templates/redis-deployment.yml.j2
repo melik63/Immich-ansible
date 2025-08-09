@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: "{{ redis_namespace }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: "{{ redis_image }}"
+          ports:
+            - containerPort: {{ redis_port }}
+          command: ["redis-server", "--appendonly yes"]
+          volumeMounts:
+            - name: redis-storage
+              mountPath: /data
+      volumes:
+        {% if redis_persistence_enabled %}
+        - name: redis-storage
+          persistentVolumeClaim:
+            claimName: redis-pvc
+        {% else %}
+        - name: redis-storage
+          emptyDir: {}
+        {% endif %}
