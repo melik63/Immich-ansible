@@ -12,6 +12,10 @@
   k8s:
     definition: "{{ lookup('template', 'immich-pvc.yml.j2') | from_yaml_all }}"
 
+- name: Создание PV в примонтированной директории
+  k8s:
+    definition: "{{ lookup('template', 'immich-pv.yml.j2') | from_yaml_all }}"
+
 - name: Создание ConfigMap с переменными окружения и Nginx конфигом
   k8s:
     definition: "{{ lookup('template', 'immich-configmap.yml.j2') | from_yaml_all }}"
