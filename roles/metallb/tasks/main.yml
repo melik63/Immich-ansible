@@ -1,17 +1,42 @@
 ---
-- name: Установить MetalLB — применение манифеста
-  k8s:
+- name: Убедиться, что установлен curl
+  apt:
+    name: curl
     state: present
-    src: https://raw.githubusercontent.com/metallb/metallb/{{ metallb_version }}/config/manifests/metallb-native.yaml
+  when: ansible_os_family == 'Debian'
+  become: yes
 
-- name: Ожидание создания namespace metallb-system
-  wait_for:
-    timeout: 120
-    delay: 5
-  register: wait_ns
-  until: >
-    (lookup('k8s', cluster_info='namespaces', namespace='metallb-system', kind='Namespace') is defined) or
-    (wait_ns.elapsed > 120)
+- name: Скачать манифест MetalLB через curl
+  command: >
+    curl -fsSL -o /tmp/metallb-native.yaml
+    https://raw.githubusercontent.com/metallb/metallb/{{ metallb_version }}/config/manifests/metallb-native.yaml
+  args:
+    # Не запускать, если файл уже есть
+    creates: /tmp/metallb-native.yaml
+
+- name: Применить манифест MetalLB через kubectl
+  command: kubectl apply -f /tmp/metallb-native.yaml
+  args:
+    # Идемпотентность: не запускать, если namespace уже есть
+    creates: /tmp/.metallb_manifest_applied
+  register: kubectl_apply
+  changed_when: "'created' in kubectl_apply.stdout or 'configured' in kubectl_apply.stdout"
+
+- name: Отметить, что манифест применён
+  file:
+    path: /tmp/.metallb_manifest_applied
+    state: touch
+    mode: '0644'
+  when: kubectl_apply.changed
+
+#- name: Ожидание создания namespace metallb-system
+#  wait_for:
+#    timeout: 120
+#    delay: 5
+#  register: wait_ns
+#  until: >
+#    (lookup('k8s', cluster_info='namespaces', namespace='metallb-system', kind='Namespace') is defined) or
+#    (wait_ns.elapsed > 120)
 
 - name: Создать IPAddressPool для MetalLB
   k8s:
@@ -19,22 +44,87 @@
     definition:
       apiVersion: metallb.io/v1beta1
       kind: IPAddressPool
-      meta:
+      metadata:
         name: default-pool
         namespace: metallb-system
       spec:
         addresses:
           - "{{ metallb_ip_range_start }}-{{ metallb_ip_range_end }}"
 
-- name: Создать L2Advertisement
+#- name: Создать L2Advertisement
+#  k8s:
+#    state: present
+#    definition:
+#      apiVersion: metallb.io/v1beta1
+#      kind: L2Advertisement
+#      metadata:
+#        name: default-adv
+#        namespace: metallb-system
+#      spec:
+#        ipAddressPools:
+#          - default-pool
+
+- name: Разрешить общий IP для traefik
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: traefik
+        namespace: kube-system
+        annotations:
+          metallb.universe.tf/allow-shared-ip: "true"
+    apply: yes
+
+- name: Создать IPAddressPool для MetalLB
   k8s:
     state: present
     definition:
       apiVersion: metallb.io/v1beta1
-      kind: L2Advertisement
-      meta:
-        name: default-adv
+      kind: IPAddressPool
+      metadata:
+        name: default-pool
         namespace: metallb-system
       spec:
-        ipAddressPools:
-          - default-pool
+        addresses:
+          - "{{ metallb_ip_range_start }}-{{ metallb_ip_range_end }}"
+
+- name: Разрешить общий IP для traefik
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: traefik
+        namespace: kube-system
+        annotations:
+          metallb.universe.tf/allow-shared-ip: "true"
+    apply: yes
+
+- name: Разрешить общий IP для immich-nginx-svc
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: immich-nginx-svc
+        namespace: immich
+        annotations:
+          metallb.universe.tf/allow-shared-ip: "true"
+    apply: yes
+
+- name: Разрешить общий IP для seaweedfs-master
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: seaweedfs-master
+        namespace: seaweed
+        annotations:
+          metallb.universe.tf/allow-shared-ip: "true"
+    apply: yes

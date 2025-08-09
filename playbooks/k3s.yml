@@ -4,6 +4,7 @@
   become: yes
   vars:
     k3s_version: v1.28.9+k3s1
+    k3s_node_ip: "{{ ansible_host }}"  # Автоопределение IP из inventory
 
   tasks:
     - name: Обновить список пакетов
@@ -18,9 +19,12 @@
           - gnupg
         state: present
 
-    - name: Скачать и установить k3s
+    - name: Скачать и установить k3s с нужными флагами
       shell: |
-        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -
+        curl -sfL https://get.k3s.io | \
+          INSTALL_K3S_VERSION={{ k3s_version }} \
+          INSTALL_K3S_EXEC="server --bind-address=0.0.0.0 --advertise-address={{ k3s_node_ip }} --tls-san={{ k3s_node_ip }} --https-listen-port=6443" \
+          sh -
       args:
         executable: /bin/bash
 
@@ -47,14 +51,14 @@
         mode: '0644'
         remote_src: yes
 
-    - name: Убедиться, что локальный хост разрешён в kubeconfig
+    - name: Убедиться, что server в kubeconfig использует https и 127.0.0.1
       lineinfile:
         path: /home/ubuntu/.kube/config
-        regexp: '^\s*server: http://127.0.0.1:6443'
+        regexp: '^\s*server: http://127\.0\.0\.1:6443'
         line: "    server: https://127.0.0.1:6443"
       notify: restart k3s
 
-    - name: Установить алиас 'k' для 'kubectl' глобально для всех пользователей
+    - name: Установить алиас 'k' для 'kubectl' глобально
       copy:
         content: |
           # Global alias for kubectl
@@ -64,14 +68,14 @@
         owner: root
         group: root
 
-    - name: Сообщить о необходимости перезапустить shell или войти заново
+    - name: Сообщить о необходимости перезапустить shell
       debug:
         msg: |
           Алиас 'k' установлен глобально.
           Чтобы он заработал, откройте новую сессию или выполните:
           exec bash -l
 
-    - name: Скачать kubeconfig на локальный хост (Ansible) для дальнейшей работы с k8s
+    - name: Скачать kubeconfig на локальный хост (Ansible)
       fetch:
         src: /etc/rancher/k3s/k3s.yaml
         dest: "{{ playbook_dir }}/../kubeconfig/k3s.yaml"
@@ -94,7 +98,7 @@
         name: k3s
         state: restarted
 
-# --- НОВЫЙ PLAY: Установка MetalLB через локальный kubectl ---
+# --- PLAY: Установка и настройка MetalLB ---
 - name: Установка и настройка MetalLB через локальный kubectl
   hosts: localhost
   connection: local
@@ -102,7 +106,7 @@
   gather_facts: no
   vars:
     kubeconfig_local: "{{ playbook_dir }}/../kubeconfig/k3s.yaml"
-    k3s_node_ip: "192.168.1.23"  # Укажи свой IP ноды
+    k3s_node_ip: "192.168.1.23"
     metallb_version: v0.14.5
     metallb_ip_range_start: 192.168.1.23
     metallb_ip_range_end: 192.168.1.23
@@ -126,6 +130,22 @@
         line: "    server: https://{{ k3s_node_ip }}:6443"
       run_once: yes
 
+    - name: Ждать, пока API-сервер k3s начнёт принимать соединения
+      wait_for:
+        host: "{{ k3s_node_ip }}"
+        port: 6443
+        timeout: 60
+        connect_timeout: 10
+      delegate_to: localhost
+
+    - name: Проверить healthz (ожидание готовности API)
+      command: kubectl --kubeconfig={{ kubeconfig_local }} get --raw /healthz
+      register: health_check
+      retries: 12
+      delay: 5
+      until: health_check.stdout == "ok"
+      ignore_errors: yes
+
     - name: Установить MetalLB — применение манифеста
       k8s:
         state: present
@@ -137,8 +157,7 @@
       until: metallb_install is not failed
 
     - name: Ожидание создания namespace metallb-system
-      command: >
-        kubectl --kubeconfig={{ kubeconfig_local }} get namespace metallb-system
+      command: kubectl --kubeconfig={{ kubeconfig_local }} get namespace metallb-system
       retries: 12
       delay: 5
       ignore_errors: yes
@@ -150,7 +169,7 @@
         definition:
           apiVersion: metallb.io/v1beta1
           kind: IPAddressPool
-          meta:
+          metadata:
             name: default-pool
             namespace: metallb-system
           spec:
@@ -164,7 +183,7 @@
         definition:
           apiVersion: metallb.io/v1beta1
           kind: L2Advertisement
-          meta:
+          metadata:
             name: default-adv
             namespace: metallb-system
           spec:

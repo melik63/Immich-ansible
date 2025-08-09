@@ -9,6 +9,15 @@
     K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
   become: yes
 
+- name: Установка metallb
+  gather_facts: yes
+  hosts: k3s
+  roles:
+    - { role: 'metallb', tags: 'metallb'}
+  environment:
+    K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
+  become: yes
+
 - name: Установка immich2
   gather_facts: no
   hosts: k3s
