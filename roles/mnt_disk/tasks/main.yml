@@ -1,0 +1,63 @@
+---
+- name: Ensure /root/.ssh directory exists
+  file:
+    path: /root/.ssh
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+
+- name: Write SSH private key to /root/.ssh/id_rsa
+  copy:
+    content: "{{ ssh_private_key }}"
+    dest: /root/.ssh/id_rsa
+    mode: '0600'
+    owner: root
+    group: root
+  tags:
+    - ssh
+
+- name: Ensure local mount point exists
+  file:
+    path: "{{ immich_sshfs_local_path }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Create systemd service for immich-sshfs
+  copy:
+    dest: /etc/systemd/system/immich-sshfs.service
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Mount Immich via SSHFS
+      After=network.target network-online.target
+      Wants=network-online.target
+      After=sshd.service
+
+      [Service]
+      Type=forking
+      User=root
+      ExecStart=/usr/bin/sshfs {{ immich_sshfs_user }}@{{ immich_sshfs_host }}:{{ immich_sshfs_remote_path }} {{ immich_sshfs_local_path }} -o IdentityFile=/root/.ssh/id_rsa -o allow_other -o reconnect -o ServerAliveInterval=15 -o _netdev
+      ExecStop=/bin/fusermount -u {{ immich_sshfs_local_path }}
+      Restart=on-failure
+      RestartSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+  notify:
+    - Reload systemd daemon
+
+- name: Enable and start immich-sshfs service
+  systemd:
+    name: immich-sshfs
+    enabled: yes
+    state: started
+
+# Обработчики
+- name: Reload systemd daemon
+  command: systemctl daemon-reload
+  args:
+    warn: false
+  changed_when: false

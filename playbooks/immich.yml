@@ -30,3 +30,13 @@
   environment:
     K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
   become: yes
+
+- name: Монтирование диска
+  gather_facts: no
+  hosts: k3s
+  tags: mnt
+  roles:
+    - { role: 'mnt_disk', tags: 'mnt_disk'}
+  environment:
+    K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
+  become: yes

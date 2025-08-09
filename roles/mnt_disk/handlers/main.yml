@@ -1,0 +1,6 @@
+---
+- name: Reload systemd daemon
+  command: systemctl daemon-reload
+  args:
+    warn: false
+  changed_when: false
