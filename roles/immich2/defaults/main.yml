@@ -10,6 +10,7 @@ nginx_image: "docker.io/nginx:alpine"
 immich_server_port: 3000
 immich_api_port: 3001
 nginx_port: 8080
+immich_ml_port: 3003
 
 # Пути к данным
 immich_storage_path: "/data"

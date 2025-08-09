@@ -19,3 +19,17 @@ spec:
       protocol: TCP
       port: 2283
       targetPort: 2283
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-ml-svc
+  namespace: {{ immich_namespace }}
+spec:
+  selector:
+    app: immich-ml
+  ports:
+    - protocol: TCP
+      port: {{ immich_ml_port }}
+      targetPort: {{ immich_ml_port }}
+  type: ClusterIP  # или LoadBalancer, если нужно внешнее подключение

@@ -84,6 +84,10 @@ spec:
       containers:
         - name: ml
           image: "{{ immich_machine_learning_image }}"
+          ports:
+            - containerPort: {{ immich_ml_port }}
+              protocol: TCP
+              name: ml-port
           envFrom:
             - configMapRef:
                 name: immich-env-config
