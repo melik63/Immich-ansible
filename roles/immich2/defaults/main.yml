@@ -3,8 +3,8 @@
 
 # Образы
 immich_api_image: "immich/api:latest"
-immich_server_image: "immich/server:latest"
-immich_machine_learning_image: "immich/machine-learning:latest"
+immich_server_image: "ghcr.io/immich-app/immich-server:v1.137.3"
+immich_machine_learning_image: "ghcr.io/immich-app/immich-machine-learning:v1.137.3"
 immich_namespace: "immich"
 nginx_image: "nginx:alpine"
 

@@ -1,3 +1,4 @@
+immich_namespace: "immich"
 # Параметры БД
 immich_postgres_host: "postgres.default.svc.cluster.local"
 immich_postgres_port: 5432

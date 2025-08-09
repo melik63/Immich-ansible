@@ -1,6 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
-meta
+metadata:
   name: immich-api
   namespace: {{ immich_namespace }}
 spec:
@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: immich-api
   template:
-    meta
+    metadata:
       labels:
         app: immich-api
     spec:
@@ -43,7 +43,7 @@ spec:
 ---
 apiVersion: apps/v1
 kind: Deployment
-meta
+metadata:
   name: immich-server
   namespace: {{ immich_namespace }}
 spec:
@@ -52,7 +52,7 @@ spec:
     matchLabels:
       app: immich-server
   template:
-    meta
+    metadata:
       labels:
         app: immich-server
     spec:
@@ -79,7 +79,7 @@ spec:
 ---
 apiVersion: apps/v1
 kind: Deployment
-meta
+metadata:
   name: immich-ml
   namespace: {{ immich_namespace }}
 spec:
@@ -88,7 +88,7 @@ spec:
     matchLabels:
       app: immich-ml
   template:
-    meta
+    metadata:
       labels:
         app: immich-ml
     spec:

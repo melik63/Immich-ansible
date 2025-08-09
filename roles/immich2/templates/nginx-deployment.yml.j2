@@ -1,6 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
-meta
+metadata:
   name: immich-nginx
   namespace: {{ immich_namespace }}
 spec:
@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: immich-nginx
   template:
-    meta
+    metadata:
       labels:
         app: immich-nginx
     spec:

@@ -2,14 +2,16 @@
 - name: Создание Secret с учётными данными БД (если ещё не существует)
   k8s:
     definition: "{{ lookup('template', 'db-secret.yml.j2') | from_yaml }}"
+    namespace: "{{ immich_namespace | default('default') }}"
   register: db_secret_result
-  ignore_errors: true  # Чтобы не падать, если Secret уже есть
+  ignore_errors: true
 
 - name: Убедиться, что Secret создан
   k8s_info:
     api_version: v1
     kind: Secret
     name: "{{ immich_db_secret_name }}"
+    namespace: "{{ immich_namespace | default('default') }}"
   register: secret_check
   until: secret_check.resources | length > 0
   retries: 3
@@ -18,17 +20,20 @@
 - name: Создание Job для миграций
   k8s:
     definition: "{{ lookup('template', 'db-migrate-job.yml.j2') | from_yaml }}"
+    namespace: "{{ immich_namespace | default('default') }}"
   register: migrate_job_result
 
 - name: Извлечение имени Job
   set_fact:
-    migrate_job_name: "{{ migrate_job_result.resource.metadata.name }}"
+    migrate_job_name: "{{ migrate_job_result.result.metadata.name }}"
+  # Было: .resource → стало: .result
 
 - name: Ожидание завершения Job
   k8s_info:
     api_version: batch/v1
     kind: Job
     name: "{{ migrate_job_name }}"
+    namespace: "{{ immich_namespace | default('default') }}"
   register: job_info
   until: >
     (job_info.resources | length > 0) and
@@ -48,4 +53,5 @@
     api_version: batch/v1
     kind: Job
     name: "{{ migrate_job_name }}"
+    namespace: "{{ immich_namespace | default('default') }}"
   when: job_info.resources[0].status.succeeded is defined and job_info.resources[0].status.succeeded > 0

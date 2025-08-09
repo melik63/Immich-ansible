@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: immich-db-migrate-{{ 100000 | random }}
+  namespace: "{{ immich_namespace }}"
   labels:
     app: immich-db-migrate
 spec:
