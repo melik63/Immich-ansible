@@ -1,0 +1,3 @@
+---
+# Можно добавить, если нужно
+kubernetes_api_version: "apps/v1"

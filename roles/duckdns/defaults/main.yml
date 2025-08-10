@@ -1,0 +1,11 @@
+---
+# Правильные переменные для образа linuxserver/duckdns
+duckdns_domain: "dim163.duckdns.org"                   # ← не SUBDOMAINS
+duckdns_token: "406bf464-c1c9-4d57-95a7-b9baf2b4e75a"                     # ← не TOKEN
+duckdns_image: "ghcr.io/linuxserver/duckdns:version-992f1854"
+duckdns_namespace: "default"
+duckdns_update_period: 300                              # в секундах
+duckdns_log_file: "false"
+duckdns_tz: "Etc/UTC"
+duckdns_puid: 1000
+duckdns_pgid: 1000

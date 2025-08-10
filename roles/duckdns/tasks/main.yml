@@ -1,0 +1,44 @@
+---
+- name: Убедиться, что namespace существует
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ duckdns_namespace }}"
+
+- name: Создать secret с токеном (если используется)
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: duckdns-secret
+        namespace: "{{ duckdns_namespace }}"
+      type: Opaque
+      data:
+        token: "{{ duckdns_token | b64encode }}"
+  when: duckdns_use_secret | bool
+
+- name: Развернуть Deployment duckdns
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'deployment.yml.j2') }}"
+    wait: yes
+    wait_timeout: 60
+
+- name: Проверить статус пода
+  k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ duckdns_namespace }}"
+    label_selectors:
+      - app=duckdns
+  register: pod_info
+
+- name: Вывести имена запущенных подов
+  debug:
+    msg: "Pod: {{ item.metadata.name }} (Status: {{ item.status.phase }})"
+  loop: "{{ pod_info.resources }}"

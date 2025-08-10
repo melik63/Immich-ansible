@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: duckdns
+  namespace: {{ duckdns_namespace }}
+  labels:
+    app: duckdns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: duckdns
+  template:
+    metadata:
+      labels:
+        app: duckdns
+    spec:
+      containers:
+      - name: duckdns
+        image: {{ duckdns_image }}
+        env:
+        - name: SUBDOMAINS
+          value: "{{ duckdns_domain }}"
+        - name: TOKEN
+          value: "{{ duckdns_token }}"
+        - name: EXTRA_DOMAINS
+          value: "{{ duckdns_domain_extra }}"
+        - name: LOG_FILE
+          value: "{{ duckdns_log_file }}"
+        - name: TZ
+          value: "{{ duckdns_tz }}"
+        - name: PUID
+          value: "{{ duckdns_puid | string }}"
+        - name: PGID
+          value: "{{ duckdns_pgid | string }}"
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: duckdns
+  namespace: {{ duckdns_namespace }}
+  labels:
+    app: duckdns
+spec:
+  selector:
+    app: duckdns
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

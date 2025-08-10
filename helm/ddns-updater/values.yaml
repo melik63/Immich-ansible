@@ -17,3 +17,4 @@ hostPaths:
 
 # Токен DuckDNS (будет в секрете)
 token: "406bf464-c1c9-4d57-95a7-b9baf2b4e75a"  # ← Замените здесь или передавайте через --set
+vault_duckdns_token: "{{ token }}"

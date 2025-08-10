@@ -1,0 +1,15 @@
+---
+- name: Установка DuckDNS 
+  hosts: k3s
+  become: yes
+  gather_facts: no
+  environment:
+    K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
+  vars:
+    duckdns_domain: "dim163.duckdns.org"
+    duckdns_domain_extra: "dim163.duckdns.org"
+    duckdns_token: "406bf464-c1c9-4d57-95a7-b9baf2b4e75a"
+    duckdns_namespace: "immich"
+    duckdns_use_secret: false
+  roles:
+    - duckdns
