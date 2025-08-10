@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ddns-updater
+version: 0.1.0
+appVersion: "1.0"
+description: Helm chart for DuckDNS dynamic DNS updater using Alpine and Python
+type: application

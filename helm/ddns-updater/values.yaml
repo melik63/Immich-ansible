@@ -1,0 +1,19 @@
+# Настройки домена
+domain: "dim163"
+
+# Расписание CronJob (по умолчанию — каждые 5 минут)
+schedule: "*/5 * * * *"
+
+# Образ (легковесный)
+image:
+  repository: alpine
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Пути на хосте для логов и кэша
+hostPaths:
+  logs: /var/log/ddns
+  cache: /var/lib/ddns/duckdns_ip.txt
+
+# Токен DuckDNS (будет в секрете)
+token: "406bf464-c1c9-4d57-95a7-b9baf2b4e75a"  # ← Замените здесь или передавайте через --set

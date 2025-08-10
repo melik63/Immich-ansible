@@ -1,0 +1,131 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-ddns-updater
+spec:
+  schedule: {{ .Values.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: ddns-updater
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Установка Python и утилит
+                  apk add --no-cache python3 curl
+
+                  # Создание скрипта
+                  cat << 'EOF' > /tmp/ddns.py
+                  #!/usr/bin/env python3
+                  import os
+                  import sys
+                  import urllib.request
+                  import logging
+
+                  DUCKDNS_DOMAIN = os.getenv("DUCKDNS_DOMAIN")
+                  DUCKDNS_TOKEN = os.getenv("DUCKDNS_TOKEN")
+                  LOG_FILE = "/var/log/duckdns.log"
+
+                  if not DUCKDNS_DOMAIN or not DUCKDNS_TOKEN:
+                      print("Error: DUCKDNS_DOMAIN or DUCKDNS_TOKEN not set", file=sys.stderr)
+                      sys.exit(1)
+
+                  logging.basicConfig(
+                      level=logging.INFO,
+                      format='%(asctime)s - %(levelname)s - %(message)s',
+                      handlers=[
+                          logging.FileHandler(LOG_FILE),
+                          logging.StreamHandler(sys.stdout)
+                      ]
+                  )
+
+                  UPDATE_URL = f"https://www.duckdns.org/update?domains={DUCKDNS_DOMAIN}&token={DUCKDNS_TOKEN}&ip="
+
+                  def get_external_ip():
+                      try:
+                          with urllib.request.urlopen("https://checkip.amazonaws.com/", timeout=10) as response:
+                              return response.read().decode('utf-8').strip()
+                      except Exception as e:
+                          logging.error(f"Failed to get external IP: {e}")
+                          return None
+
+                  def update_duckdns(ip):
+                      url = UPDATE_URL + ip
+                      try:
+                          with urllib.request.urlopen(url, timeout=10) as response:
+                              result = response.read().decode('utf-8').strip()
+                          if result == "OK":
+                              logging.info(f"IP updated successfully: {ip}")
+                              return True
+                          else:
+                              logging.warning(f"DuckDNS response: {result}")
+                              return False
+                      except Exception as e:
+                          logging.error(f"Failed to update DuckDNS: {e}")
+                          return False
+
+                  def main():
+                      logging.info("Starting DuckDNS update")
+
+                      current_ip = get_external_ip()
+                      if not current_ip:
+                          logging.error("Could not determine current IP. Skipping.")
+                          return
+
+                      ip_cache_file = "/tmp/ip_cache.txt"
+                      try:
+                          last_ip = None
+                          if os.path.exists(ip_cache_file):
+                              with open(ip_cache_file, 'r') as f:
+                                  last_ip = f.read().strip()
+                          if last_ip == current_ip:
+                              logging.info(f"IP unchanged: {current_ip}. No update needed.")
+                              return
+                      except Exception as e:
+                          logging.warning(f"Failed to read IP cache: {e}")
+
+                      if update_duckdns(current_ip):
+                          try:
+                              with open(ip_cache_file, 'w') as f:
+                                  f.write(current_ip)
+                          except Exception as e:
+                              logging.warning(f"Failed to write IP cache: {e}")
+
+                  if __name__ == "__main__":
+                      main()
+                  EOF
+
+                  # Запуск скрипта
+                  python3 /tmp/ddns.py
+              env:
+                - name: DUCKDNS_DOMAIN
+                  value: {{ .Values.domain }}
+                - name: DUCKDNS_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Release.Name }}-ddns-secret
+                      key: token
+              volumeMounts:
+                - name: log-volume
+                  mountPath: /var/log
+                - name: cache-volume
+                  mountPath: /tmp/ip_cache.txt
+                  subPath: ip_cache.txt
+          volumes:
+            - name: log-volume
+              hostPath:
+                path: {{ .Values.hostPaths.logs }}
+                type: DirectoryOrCreate
+            - name: cache-volume
+              hostPath:
+                path: {{ .Values.hostPaths.cache }}
+                type: FileOrCreate
