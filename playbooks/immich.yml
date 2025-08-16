@@ -9,7 +9,7 @@
   become: yes
 
 - name: Установка metallb
-  gather_facts: yes
+  gather_facts: no
   hosts: k3s
   roles:
     - { role: 'metallb', tags: 'metallb'}
