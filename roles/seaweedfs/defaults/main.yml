@@ -1,0 +1,2 @@
+seaweed_namespace: seaweed  
+kubeconfig_path: /home/ubuntu/.kube/config

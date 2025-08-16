@@ -1,0 +1,82 @@
+- name: Проверить доступность kubectl
+  command: kubectl api-resources
+  register: kubectl_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Вывести ошибку, если kubectl недоступен
+  fail:
+    msg: "kubectl не установлен или не работает. Убедитесь, что k3s установлен корректно."
+  when: kubectl_check is failed
+
+- name: Создать namespace seaweed (если не существует)
+  command: sh -c "kubectl get namespace {{ seaweed_namespace }} || kubectl create namespace {{ seaweed_namespace }}"
+  register: create_namespace
+  changed_when: "'already exists' not in create_namespace.stderr"
+
+- name: Сгенерировать содержимое манифеста из шаблона в памяти
+  set_fact:
+    manifest_content: |
+      {{ lookup('template', 'templates/seaweedfs-s3.yaml.j2') }}
+
+- name: Применить манифест через stdin, чтобы не использовать файл
+  shell: |
+    echo '{{ manifest_content }}' | kubectl apply -f -
+  args:
+    executable: /bin/bash
+  register: apply_result
+  changed_when: "'created' in apply_result.stdout or 'configured' in apply_result.stdout"
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+- name: Отладка — показать результат применения манифеста
+  debug:
+    msg: "{{ apply_result.stdout }}"
+
+- name: Подождать, пока под seaweedfs-master станет Ready
+  command: kubectl wait --for=condition=Ready pod -l app=seaweedfs-master -n {{ seaweed_namespace }} --timeout=120s
+  ignore_errors: yes
+  register: master_ready
+  retries: 6
+  delay: 10
+  until: master_ready is succeeded
+
+- name: Подождать, пока под seaweedfs-volume станет Ready
+  command: kubectl wait --for=condition=Ready pod -l app=seaweedfs-volume -n {{ seaweed_namespace }} --timeout=120s
+  ignore_errors: yes
+  register: volume_ready
+  retries: 6
+  delay: 10
+  until: volume_ready is succeeded
+
+- name: Подождать, пока под seaweedfs-filer станет Ready
+  command: kubectl wait --for=condition=Ready pod -l app=seaweedfs-filer -n {{ seaweed_namespace }} --timeout=120s
+  ignore_errors: yes
+  register: filer_ready
+  retries: 6
+  delay: 10
+  until: filer_ready is succeeded
+
+- name: Вывести статус подов
+  command: kubectl get pods -n {{ seaweed_namespace }}
+  register: pod_status
+  changed_when: false
+
+- name: Отладка. Вывести статус подов
+  debug:
+    msg: "{{ pod_status.stdout }}"
+
+- name: Вывести информацию о сервисах
+  command: kubectl get svc -n {{ seaweed_namespace }}
+  register: svc_status
+  changed_when: false
+
+- name: Отладка. Вывести сервисы
+  debug:
+    msg: "{{ svc_status.stdout }}"
+
+- name: Вывести команду для входа в weed shell
+  debug:
+    msg: |
+      Чтобы войти в weed shell:
+      kubectl -n seaweed exec -it deploy/seaweedfs-master -- weed shell -master=seaweedfs-master:9333
