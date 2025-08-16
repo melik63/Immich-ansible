@@ -1,0 +1,16 @@
+- name: Установить алиас 'k' для 'kubectl' глобально
+  copy:
+    content: |
+      # Global alias for kubectl
+      alias k='kubectl'
+    dest: /etc/profile.d/kubectl_alias.sh
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Сообщить о необходимости перезапустить shell
+  debug:
+    msg: |
+      Алиас 'k' установлен глобально.
+      Чтобы он заработал, откройте новую сессию или выполните:
+      exec bash -l
