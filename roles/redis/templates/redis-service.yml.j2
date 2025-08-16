@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis
+  name: {{ redis_host }}
   namespace: {{ redis_namespace }}
 spec:
   selector:

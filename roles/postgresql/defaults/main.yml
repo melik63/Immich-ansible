@@ -2,6 +2,7 @@
 ---
 postgres_namespace: "immich"
 postgres_image: "pgvector/pgvector:pg17"
+postgres_host: "postgres"
 postgres_port: 5432
 postgres_db: "immich"
 postgres_user: "immich"

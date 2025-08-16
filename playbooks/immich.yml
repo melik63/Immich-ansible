@@ -22,7 +22,7 @@
   hosts: k3s
   tags: immich-all
   roles:
-    - { role: 'immich2', tags: 'immich'}
+    - { role: 'immich', tags: 'immich'}
     - { role: 'redis', tags: 'redis'}
     - { role: 'postgresql', tags: 'postgresql'}
   environment:

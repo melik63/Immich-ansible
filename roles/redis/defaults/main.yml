@@ -1,6 +1,7 @@
 ---
 redis_namespace: "immich"
 redis_image: "redis:7.2-alpine"
+redis_host: "redis"
 redis_port: 6379
 redis_persistence_enabled: false
 redis_storage_size: "2Gi"
