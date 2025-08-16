@@ -1,0 +1,12 @@
+# Игнорировать все скрытые файлы
+.*
+collections
+roles
+
+# Но НЕ игнорировать конкретные важные файлы
+!.git
+!.gitignore
+!.github/
+!.gitlab-ci.yml
+!.ansible.cfg
+!./

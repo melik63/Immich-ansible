@@ -1,0 +1,9 @@
+---
+- name: Установка seaweedfs
+  hosts: k3s
+  become: yes
+  gather_facts: no
+  environment:
+    K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
+  roles:
+    - { role: 'seaweedfs', tags: 'seaweedfs'}

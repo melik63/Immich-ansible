@@ -1,0 +1,11 @@
+---
+- name: Установка DuckDNS 
+  hosts: k3s
+  become: yes
+  gather_facts: no
+  environment:
+    K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
+  vars_files:
+    - "../inventories/group_vars/K3S.yml"
+  roles:
+    - { role: 'duckdns', tags: 'ddns' }

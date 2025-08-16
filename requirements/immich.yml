@@ -1,0 +1,20 @@
+- src: git@github.com:melik63/immich-k3s-role.git
+  scm: git
+  version: v0.0.1
+  name: immich
+
+- src: git@github.com:melik63/immich-alias-role.git
+  scm: git
+  name: alias
+
+- src: git@github.com:melik63/immich-mnt-disk-role.git
+  scm: git
+  name: mnt_disk
+
+- src: git@github.com:melik63/immich-postgresql-role.git
+  scm: git
+  name: postgresql
+
+- src: git@github.com:melik63/immich-redis-role.git
+  scm: git
+  name: redis

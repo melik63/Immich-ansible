@@ -1,0 +1,27 @@
+---
+- name: Установка k3s на Ubuntu
+  hosts: k3s
+  become: yes
+  vars_files:
+    - "../inventories/group_vars/K3S.yml"
+  roles:
+    - { role: 'k3s', tags: 'k3s'}
+
+
+- name: Установка Глобального алиаса 'k'
+  hosts: k3s
+  become: yes
+  vars_files:
+    - "../inventories/group_vars/K3S.yml"
+  roles:
+    - { role: 'alias', tags: 'alias'}
+    
+- name: Установка и настройка MetalLB через локальный kubectl
+  hosts: localhost
+  connection: local
+  become: false
+  gather_facts: yes
+  vars_files:
+    - "../inventories/group_vars/K3S.yml"
+  roles:
+    - { role: 'metallb', tags: 'metallb'}

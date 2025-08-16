@@ -1,0 +1,8 @@
+- src: git@github.com:melik63/seaweedfs-role.git
+  scm: git
+  name: seaweedfs
+
+- src: git@github.com:melik63/duckdns-role.git
+  scm: git
+  name: duckdns
+

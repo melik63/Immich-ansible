@@ -1,0 +1,11 @@
+- src: git@github.com:melik63/k3s-ghcr-login-role.git
+  scm: git
+  name: ghcr-login
+
+- src: git@github.com:melik63/k3s-role.git
+  scm: git
+  name: k3s
+
+- src: git@github.com:melik63/k3s-metallb-role.git
+  scm: git
+  name: metallb

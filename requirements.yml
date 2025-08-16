@@ -1,0 +1,9 @@
+# requirements.yml
+roles:
+- include: requirements/immich.yml 
+- include: requirements/k3s.yml
+- include: requirements/other.yml
+collections:
+- name: community.kubernetes
+- name: community.general
+- name: kubernetes.core

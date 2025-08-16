@@ -1,0 +1,98 @@
+seaweed_namespace: seaweed
+kubeconfig_path: /home/ubuntu/.kube/config
+
+#Роль k3s
+k3s_version: v1.28.9+k3s1
+k3s_node_ip: "{{ ansible_host }}"
+
+#Роль MetalLB
+kubeconfig_local: "{{ playbook_dir }}/../../kubeconfig/k3s.yaml"
+k3s_node_ip: "192.168.1.23"
+metallb_ip_host_master: "{{ k3s_node_ip }}"
+metallb_version: v0.14.5
+metallb_ip_range_start: 192.168.1.23
+metallb_ip_range_end: 192.168.1.23
+
+#Роль DuckDNS
+duckdns_domain: "{{ vault_duckdns_domain }}"
+duckdns_domain_extra: "{{ vault_duckdns_domain_extra }}"
+duckdns_token: "{{ vault_duckdns_token }}"
+duckdns_namespace: "immich"
+duckdns_use_secret: false
+duckdns_image: "ghcr.io/linuxserver/duckdns:version-992f1854"
+duckdns_log_file: "false"
+duckdns_tz: "Etc/UTC"
+duckdns_puid: 1000
+duckdns_pgid: 1000
+ghcr_username: "{{ vault_ghcr_username }}"
+ghcr_token: "{{ vault_ghcr_token }}"
+
+#Роль immich
+immich_server_image: "ghcr.io/immich-app/immich-server:v1.137.3"
+immich_machine_learning_image: "ghcr.io/immich-app/immich-machine-learning:v1.137.3"
+immich_namespace: "immich"
+nginx_image: "docker.io/nginx:alpine"
+immich_server_port: 3000
+immich_api_port: 3001
+nginx_port: 8080
+immich_ml_port: 3003
+immich_server_resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+##Пути к данным
+immich_storage_path: "/data"
+immich_upload_path: "/data/upload"
+##Порт, на котором слушает immich-server
+immich_server_internal_port: 3333
+immich_nginx_port: 8080
+##Реквизиты PostgreSQL и Redis
+immich_postgres_host: "{{ postgres_host }}"
+immich_postgres_port: "{{ postgres_port }}"
+immich_postgres_user: "{{ postgres_user }}"
+immich_postgres_password: "{{ postgres_password }}"
+immich_postgres_db: "{{ postgres_db }}"
+immich_redis_host: "{{ redis_host }}"
+immich_redis_port: "{{ redis_port }}"
+
+#Роль Nginx
+immich_nginx_config_template: "nginx.conf.j2"
+immich_enable_ingress: true
+immich_namespace: "immich"
+
+#Роль Mount Disk
+immich_sshfs_user: "user"
+immich_sshfs_host: "192.168.1.15"
+immich_sshfs_remote_path: "/E:/Immich"
+immich_sshfs_local_path: "/mnt/immich"
+ssh_private_key: "{{ vault_ssh_private_key }}"
+
+#Роль PostgreSQL
+postgres_namespace: "immich"
+postgres_image: "pgvector/pgvector:pg17"
+postgres_host: "postgres"
+postgres_port: 5432
+postgres_db: "immich"
+postgres_user: "{{ vault_postgres_user }}"
+postgres_password: "{{ vault_postgres_password }}"
+postgres_persistence_enabled: false
+postgres_storage_size: "10Gi"
+
+#Роль Redis
+redis_namespace: "immich"
+redis_image: "redis:7.2-alpine"
+redis_host: "redis"
+redis_port: 6379
+redis_persistence_enabled: false
+redis_storage_size: "2Gi"
+redis_volume_source: "{{ 'persistentVolumeClaim' if redis_persistence_enabled else 'emptyDir' }}"
+redis_volume_config: |
+  {% if redis_persistence_enabled %}
+  persistentVolumeClaim:
+    claimName: redis-pvc
+  {% else %}
+  emptyDir: {}
+  {% endif %}
