@@ -4,9 +4,6 @@
   become: yes
   vars_files:
     - "../inventories/group_vars/K3S.yml"
-  vars:
-    k3s_version: v1.28.9+k3s1
-    k3s_node_ip: "{{ ansible_host }}"
   roles:
     - { role: 'k3s', tags: 'k3s'}
 
@@ -26,11 +23,5 @@
   gather_facts: yes
   vars_files:
     - "../inventories/group_vars/K3S.yml"
-  vars:
-    kubeconfig_local: "{{ playbook_dir }}/../kubeconfig/k3s.yaml"
-    k3s_node_ip: "192.168.1.23"
-    metallb_version: v0.14.5
-    metallb_ip_range_start: 192.168.1.23
-    metallb_ip_range_end: 192.168.1.23
   roles:
     - { role: 'metallb', tags: 'metallb'}

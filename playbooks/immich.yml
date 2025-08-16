@@ -2,9 +2,8 @@
 - name: Doker login
   gather_facts: no
   hosts: k3s
-  tags: docker-login
   roles:
-    - ghcr-login
+    - { role: 'ghcr-login', tags: 'docker-login'}
   environment:
     K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
   become: yes
@@ -21,12 +20,11 @@
 - name: Установка immich2
   gather_facts: no
   hosts: k3s
-  tags: immich
+  tags: immich-all
   roles:
-    - { role: 'immich2', tags: 'immich2'}
+    - { role: 'immich2', tags: 'immich'}
     - { role: 'redis', tags: 'redis'}
     - { role: 'postgresql', tags: 'postgresql'}
-#    - { role: 'immich-db-migrate', tags: 'immich-db-migrate'}
   environment:
     K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
   become: yes
@@ -34,7 +32,6 @@
 - name: Монтирование диска
   gather_facts: no
   hosts: k3s
-  tags: mnt
   roles:
     - { role: 'mnt_disk', tags: 'mnt_disk'}
   environment:

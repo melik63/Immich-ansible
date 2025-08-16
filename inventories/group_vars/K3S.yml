@@ -1,0 +1,17 @@
+#Установка k3s на Ubuntu
+k3s_version: v1.28.9+k3s1
+k3s_node_ip: "{{ ansible_host }}"
+
+#Установка и настройка MetalLB
+kubeconfig_local: "{{ playbook_dir }}/../kubeconfig/k3s.yaml"
+k3s_node_ip: "192.168.1.23"
+metallb_version: v0.14.5
+metallb_ip_range_start: 192.168.1.23
+metallb_ip_range_end: 192.168.1.23
+
+#Установка DuckDNS
+duckdns_domain: "dim163.duckdns.org"
+duckdns_domain_extra: "dim163.duckdns.org"
+duckdns_token: "406bf464-c1c9-4d57-95a7-b9baf2b4e75a"
+duckdns_namespace: "immich"
+duckdns_use_secret: false
