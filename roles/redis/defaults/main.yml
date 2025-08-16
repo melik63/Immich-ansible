@@ -6,7 +6,6 @@ redis_port: 6379
 redis_persistence_enabled: false
 redis_storage_size: "2Gi"
 
-# Новая переменная
 redis_volume_source: "{{ 'persistentVolumeClaim' if redis_persistence_enabled else 'emptyDir' }}"
 redis_volume_config: |
   {% if redis_persistence_enabled %}

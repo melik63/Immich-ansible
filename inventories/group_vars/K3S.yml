@@ -8,6 +8,7 @@ k3s_node_ip: "{{ ansible_host }}"
 #Роль MetalLB
 kubeconfig_local: "{{ playbook_dir }}/../kubeconfig/k3s.yaml"
 k3s_node_ip: "192.168.1.23"
+metallb_ip_host_master: "{{ k3s_node_ip }}"
 metallb_version: v0.14.5
 metallb_ip_range_start: 192.168.1.23
 metallb_ip_range_end: 192.168.1.23

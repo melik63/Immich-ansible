@@ -121,4 +121,4 @@
     kubectl patch svc seaweedfs-master -n seaweed -p '{"metadata": {"annotations": {"metallb.universe.tf/allow-shared-ip": "true"}}}'
   args:
     creates: /tmp/.annotation_seaweedfs_master_shared  # чтобы не запускать каждый раз
-  delegate_to: 192.168.1.23
+  delegate_to: "{{ metallb_ip_host_master }}"

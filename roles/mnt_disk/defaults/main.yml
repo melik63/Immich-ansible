@@ -1,60 +1,11 @@
 # Секретный ключ SSH (пример значения — замените на своё)
 ssh_private_key: |
   -----BEGIN RSA PRIVATE KEY-----
-  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
+  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
   -----END RSA PRIVATE KEY-----
-
 
 # Параметры SSHFS (можно переопределять в inventory или vars)
 immich_sshfs_user: "user"
-immich_sshfs_host: "192.168.1.15"
-immich_sshfs_remote_path: "/E:/Immich"
+immich_sshfs_host: "192.168.1.1"
+immich_sshfs_remote_path: "/C:/Immich"
 immich_sshfs_local_path: "/mnt/immich"
