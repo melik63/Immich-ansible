@@ -5,7 +5,3 @@
 - src: git@github.com:melik63/duckdns-role.git
   scm: git
   name: duckdns
-
-- src: git@github.com:melik63/duckdns-role.git
-  scm: git
-  name: duckdns

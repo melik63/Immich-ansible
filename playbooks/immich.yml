@@ -24,7 +24,7 @@
   roles:
     - { role: 'immich', tags: 'immich'}
     - { role: 'redis', tags: 'redis'}
-    - { role: 'immich-postgresql-role2', tags: 'postgresql'}
+    - { role: 'postgresql', tags: 'postgresql'}
   environment:
     K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
   become: yes

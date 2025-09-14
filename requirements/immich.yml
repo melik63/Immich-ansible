@@ -11,13 +11,13 @@
   scm: git
   name: mnt_disk
 
-- src: git@github.com:melik63/immich-postgresql-role.git
-  scm: git
-  name: postgresql
+#- src: git@github.com:melik63/immich-postgresql-role.git
+#  scm: git
+#  name: postgresql
 
 - src: git@github.com:melik63/immich-postgresql-role2.git
   scm: git
-  name: immich-postgresql-role2
+  name: postgresql
 
 - src: git@github.com:melik63/immich-redis-role.git
   scm: git
