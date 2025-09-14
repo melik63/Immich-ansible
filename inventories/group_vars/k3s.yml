@@ -50,8 +50,8 @@ immich_upload_path: "/data/upload"
 immich_server_internal_port: 3333
 immich_nginx_port: 8080
 ##Реквизиты PostgreSQL и Redis
-immich_postgres_host: "{{ postgres_host }}"
-immich_postgres_port: "{{ postgres_port }}"
+immich_postgres_host: "{{ postgres_host | default postgres}}"
+immich_postgres_port: "{{ postgres_port | default 5432 }}"
 immich_postgres_user: "{{ postgres_user }}"
 immich_postgres_password: "{{ postgres_password }}"
 immich_postgres_db: "{{ postgres_db }}"
@@ -72,14 +72,16 @@ ssh_private_key: "{{ vault_ssh_private_key }}"
 
 #Роль PostgreSQL
 postgres_namespace: "immich"
-postgres_image: "pgvector/pgvector:pg17"
-postgres_host: "postgres"
-postgres_port: 5432
-postgres_db: "immich"
+postgres_image: "pgvector/pgvector:pg17-trixie"
+postgres_replicas: 3
+postgres_storage_size: "10Gi"
 postgres_user: "{{ vault_postgres_user }}"
 postgres_password: "{{ vault_postgres_password }}"
-postgres_persistence_enabled: false
-postgres_storage_size: "10Gi"
+postgres_db: "immich"
+backup_image: "bitnami/kubectl:latest"
+backup_schedule: "0 2 * * *"   # каждый день в 2 ночи
+backup_bucket: "s3://my-postgres-backups"  # заменить на свой бакет
+backup_secret: "minio-creds"
 
 #Роль Redis
 redis_namespace: "immich"

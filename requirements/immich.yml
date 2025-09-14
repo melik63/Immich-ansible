@@ -18,3 +18,7 @@
 - src: git@github.com:melik63/immich-postgresql-role2.git
   scm: git
   name: immich-postgresql-role2
+
+- src: git@github.com:melik63/immich-redis-role.git
+  scm: git
+  name: redis
