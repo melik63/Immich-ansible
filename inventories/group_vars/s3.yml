@@ -1,0 +1,17 @@
+seaweedfs_chart_repo: "https://seaweedfs.github.io/seaweedfs/helm/"
+seaweedfs_chart_name: "seaweedfs"
+seaweedfs_chart_version: "3.56"
+seaweedfs_release_name: "seaweedfs"
+seaweedfs_namespace: "seaweedfs"
+seaweedfs_values:
+  master:
+    replicas: 1
+  volume:
+    replicas: 1
+  filer:
+    replicas: 1
+    storage: 10Gi
+  s3:
+    enabled: true
+seaweedfs_external_ip: "{{ metallb_ip_range_start }}"
+seaweedfs_service_name: "seaweedfs-s3" 

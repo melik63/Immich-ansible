@@ -79,8 +79,7 @@ backup_image: "bitnami/kubectl:latest"
 backup_schedule: "0 2 * * *"   # каждый день в 2 ночи
 backup_bucket: "s3://my-postgres-backups"  # заменить на свой бакет
 backup_secret: "minio-creds"
-
-seaweed_namespace: "{{immich_namespace}}"
+seaweed_namespace: "{{seaweedfs_namespace}}"
 
 #Роль Redis
 redis_namespace: "immich"
