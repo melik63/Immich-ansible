@@ -21,6 +21,9 @@
   gather_facts: no
   hosts: k3s
   tags: immich-all
+  vars_files:
+    - "../inventories/group_vars/k3s.yml"
+    - "../inventories/group_vars/s3.yml"
   roles:
     - { role: 'immich', tags: 'immich'}
     - { role: 'redis', tags: 'redis'}

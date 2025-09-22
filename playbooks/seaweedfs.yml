@@ -5,5 +5,7 @@
   gather_facts: no
   environment:
     K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
+  vars_files:
+    - "../inventories/group_vars/s3.yml"
   roles:
     - { role: 'seaweedfs', tags: 'seaweedfs'}
