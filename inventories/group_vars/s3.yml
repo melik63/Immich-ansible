@@ -15,3 +15,7 @@ seaweedfs_values:
     enabled: true
 seaweedfs_external_ip: "{{ metallb_ip_range_start }}"
 seaweedfs_service_name: "seaweedfs-s3" 
+AdminAccessKey: 'immich'
+AdminSecretKey: 'immich_pass'
+ReadOnlyAccessKey: 'immich_read'
+ReadOnlySecretKey: 'immich_read'
