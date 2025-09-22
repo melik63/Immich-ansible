@@ -3,7 +3,7 @@
   hosts: k3s
   become: yes
   vars_files:
-    - "../inventories/group_vars/K3S.yml"
+    - "../inventories/group_vars/k3s.yml"
   roles:
     - { role: 'k3s', tags: 'k3s'}
 
@@ -12,7 +12,7 @@
   hosts: k3s
   become: yes
   vars_files:
-    - "../inventories/group_vars/K3S.yml"
+    - "../inventories/group_vars/k3s.yml"
   roles:
     - { role: 'alias', tags: 'alias'}
     
@@ -22,6 +22,15 @@
   become: false
   gather_facts: yes
   vars_files:
-    - "../inventories/group_vars/K3S.yml"
+    - "../inventories/group_vars/k3s.yml"
   roles:
     - { role: 'metallb', tags: 'metallb'}
+
+- name: Установка Глобального алиаса 'k'
+  hosts: k3s
+  become: yes
+  vars_files:
+    - "../inventories/group_vars/k3s.yml"
+  roles:
+    - { role: 'helm', tags: 'helm'}
+

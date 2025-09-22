@@ -9,3 +9,7 @@
 - src: git@github.com:melik63/k3s-metallb-role.git
   scm: git
   name: metallb
+
+- src: git@github.com:melik63/helm-conf.git
+  scm: git
+  name: helm
