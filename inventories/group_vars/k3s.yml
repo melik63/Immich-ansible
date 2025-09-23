@@ -47,8 +47,8 @@ immich_upload_path: "/data/upload"
 immich_server_internal_port: 3333
 immich_nginx_port: 8080
 ##Реквизиты PostgreSQL и Redis
-immich_postgres_host: "{{ postgres_host | default postgres}}"
-immich_postgres_port: "{{ postgres_port | default 5432 }}"
+immich_postgres_host: "{{ postgres_host | default ('postgres')}}"
+immich_postgres_port: "{{ postgres_port | default (5432)}}"
 immich_postgres_user: "{{ postgres_user }}"
 immich_postgres_password: "{{ postgres_password }}"
 immich_postgres_db: "{{ postgres_db }}"
@@ -76,7 +76,7 @@ postgres_user: "{{ vault_postgres_user }}"
 postgres_password: "{{ vault_postgres_password }}"
 postgres_db: "immich"
 backup_image: "postgres:17-alpine"
-backup_schedule: "*/5 * * * *"   # каждый день в 2 ночи
+backup_schedule: "* */2 * * *"   # каждый день в 2 ночи
 backup_bucket: "rdbms"  # заменить на свой бакет
 #backup_secret: "{{ AdminSecretKey }}"
 seaweed_namespace: "{{seaweedfs_namespace}}"
