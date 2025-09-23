@@ -6,6 +6,6 @@
   environment:
     K8S_AUTH_KUBECONFIG: "/home/ubuntu/.kube/config"
   vars_files:
-    - "../inventories/group_vars/K3S.yml"
+    - "../inventories/group_vars/k3s.yml"
   roles:
     - { role: 'duckdns', tags: 'ddns' }

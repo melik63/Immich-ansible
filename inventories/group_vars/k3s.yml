@@ -25,8 +25,8 @@ ghcr_username: "{{ vault_ghcr_username }}"
 ghcr_token: "{{ vault_ghcr_token }}"
 
 #Роль immich
-immich_server_image: "ghcr.io/immich-app/immich-server:v1.137.3"
-immich_machine_learning_image: "ghcr.io/immich-app/immich-machine-learning:v1.137.3"
+immich_server_image: "ghcr.io/immich-app/immich-server:v1.143.0"
+immich_machine_learning_image: "ghcr.io/immich-app/immich-machine-learning:v1.143.0"
 immich_namespace: "immich"
 nginx_image: "docker.io/nginx:alpine"
 immich_server_port: 3000
@@ -76,7 +76,7 @@ postgres_user: "{{ vault_postgres_user }}"
 postgres_password: "{{ vault_postgres_password }}"
 postgres_db: "immich"
 backup_image: "postgres:17-alpine"
-backup_schedule: "* */2 * * *"   # каждый день в 2 ночи
+backup_schedule: "0 */2 * * *"   # каждый день в 2 ночи
 backup_bucket: "rdbms"  # заменить на свой бакет
 #backup_secret: "{{ AdminSecretKey }}"
 seaweed_namespace: "{{seaweedfs_namespace}}"
